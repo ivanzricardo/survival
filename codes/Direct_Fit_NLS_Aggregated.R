@@ -77,9 +77,11 @@ legend("topright",
 )
 
 #Goodness-of-fit
+#The lower the value for AIC, the better the fit of the model. 
+#The absolute value of the AIC value is not important. 
+#It can be positive or negative.
 AIC(reg_exp, reg_wei, reg_logl, reg_gomp, reg_lnorm, reg_gam_gen)
 BIC(reg_exp, reg_wei, reg_logl, reg_gomp, reg_lnorm, reg_gam_gen)
-
 AIC_BIC <- cbind(AIC(reg_exp, reg_wei, reg_logl, reg_gomp, reg_lnorm, reg_gam_gen),BIC(reg_exp, reg_wei, reg_logl, reg_gomp, reg_lnorm, reg_gam_gen))
 
 #Export results
