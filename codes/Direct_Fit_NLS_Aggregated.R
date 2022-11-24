@@ -16,12 +16,12 @@ time <- data$time
 survival <- data$survival
 
 #Fit desired survival functions with NLS
-reg_exp <- nls(survival ~ exp(-l_e*time),data, start=list(l_e=0.1)) #Exponencial 
+reg_exp <- nls(survival ~ exp(-l_e*time),data, start=list(l_e=0.1)) #Exponential 
 reg_wei <- nls(survival ~ exp(-l_w*(time^g_w)),data, start=list(l_w=1,g_w=0.01)) #Weibull
-reg_logl <- nls(survival ~ 1/(1 + l_l*time^g_l),data, start=list(l_l=0.1,g_l=0.01)) #Log-Logistica 
+reg_logl <- nls(survival ~ 1/(1 + l_l*time^g_l),data, start=list(l_l=0.1,g_l=0.01)) #Log-Logistic 
 reg_gomp <- nls(survival ~ exp(-((g_g)/l_g)*(exp(l_g*time) - 1)),data, start=list(l_g=0.1,g_g=0.01), algorithm="port", lower=c(-Inf,-Inf)) #Gompertz
 reg_lnorm <- nls(survival ~ 1- pnorm(((log(time)-mu_ln)/sd_ln),mu_ln,sd_ln),data, start=list(mu_ln=1,sd_ln=1)) #Lognormal
-reg_gam_gen <- nls(survival ~ 1 - pgengamma(time, mu_g, sigma, Q),data, start=list(sigma=1,mu_g=1, Q=1), algorithm="port", lower=c(-Inf,-Inf,-Inf)) #Gama generalizada
+reg_gam_gen <- nls(survival ~ 1 - pgengamma(time, mu_g, sigma, Q),data, start=list(sigma=1,mu_g=1, Q=1), algorithm="port", lower=c(-Inf,-Inf,-Inf)) #Generalized Gama 
 
 #Store summary fitting
 s_reg_exp <- summary(reg_exp)
