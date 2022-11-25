@@ -9,7 +9,7 @@ install.packages("flexsurv")
 library(flexsurv)
 
 #Load survival data
-data <- read.csv2('https://raw.githubusercontent.com/ivanzricardo/survival/main/data/OS_anastrozole.csv')
+data <- read.csv2('https://raw.githubusercontent.com/ivanzricardo/survival/main/data/PFS_fulvestrant.csv')
 
 #Save time and survival vectors
 time <- data$time
@@ -17,10 +17,10 @@ survival <- data$survival
 
 #Fit desired survival functions with NLS
 reg_exp <- nls(survival ~ exp(-l_e*time),data, start=list(l_e=0.1)) #Exponential 
-reg_wei <- nls(survival ~ exp(-l_w*(time^g_w)),data, start=list(l_w=1,g_w=0.01)) #Weibull
-reg_logl <- nls(survival ~ 1/(1 + l_l*time^g_l),data, start=list(l_l=0.1,g_l=0.01)) #Log-Logistic 
-reg_gomp <- nls(survival ~ exp(-((g_g)/l_g)*(exp(l_g*time) - 1)),data, start=list(l_g=0.1,g_g=0.01), algorithm="port", lower=c(-Inf,-Inf)) #Gompertz
-reg_lnorm <- nls(survival ~ 1- pnorm(((log(time)-mu_ln)/sd_ln),mu_ln,sd_ln),data, start=list(mu_ln=1,sd_ln=1)) #Lognormal
+reg_wei <- nls(survival ~ exp(-(time/l_w)^g_w),data, start=list(l_w=1,g_w=10)) #Weibull
+reg_logl <- nls(survival ~ 1/(1 + (time/a_l)^g_l),data, start=list(a_l=1,g_l=1)) #Log-Logistic 
+reg_gomp <- nls(survival ~ exp(-(b/a)*(exp(a*time) - 1)),data, start=list(a=0.1,b=0.01), algorithm="port", lower=c(-Inf,-Inf)) #Gompertz
+reg_lnorm <- nls(survival ~ 1- pnorm(((log(time)-mu_ln)/sd_ln),0,1),data, start=list(mu_ln=1,sd_ln=1)) #Lognormal
 reg_gam_gen <- nls(survival ~ 1 - pgengamma(time, mu_g, sigma, Q),data, start=list(sigma=1,mu_g=1, Q=1), algorithm="port", lower=c(-Inf,-Inf,-Inf)) #Generalized Gama 
 
 #Store summary fitting
@@ -54,10 +54,10 @@ data[(nrow(data)+1):(nrow(data)+horizon),"time_pred"] <- seq(from = round(as.num
                                                              to = round(as.numeric(data[nrow(data),1]+horizon), digits = 0), by = 1)
 time_pred <-data$time_pred
 data$ajuste_exp <- exp(-p_reg_exp[1,1]*time_pred)
-data$ajuste_wei <- exp(-p_reg_wei[1,1]*(time_pred^p_reg_wei[2,1]))
-data$ajuste_logl <- 1/(1 + p_reg_logl[1,1]*time_pred^p_reg_logl[2,1])
+data$ajuste_wei <- exp(-(time_pred/p_reg_wei[1,1])^p_reg_wei[2,1])
+data$ajuste_logl <- 1/(1 + (time_pred/p_reg_logl[1,1])^p_reg_logl[2,1])
 data$ajuste_gomp <- exp(-((p_reg_gomp[2,1])/p_reg_gomp[1,1])*(exp(p_reg_gomp[1,1]*time_pred) - 1))
-data$ajuste_lnorm <- 1- pnorm(((log(time_pred)-p_reg_lnorm[1,1])/p_reg_lnorm[2,1]),p_reg_lnorm[1,1],p_reg_lnorm[2,1])
+data$ajuste_lnorm <- 1- pnorm(((log(time_pred)-p_reg_lnorm[1,1])/p_reg_lnorm[2,1]),0,1)
 data$ajuste_gam_gen <- 1 - pgengamma(time_pred, p_reg_gam_gen[2,1], p_reg_gam_gen[1,1], p_reg_gam_gen[3,1])
 
 #Plot Kaplan-Meier data and fitted curves
