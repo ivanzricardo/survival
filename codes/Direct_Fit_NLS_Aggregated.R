@@ -21,7 +21,7 @@ reg_wei <- nls(survival ~ exp(-(time/l_w)^g_w),data, start=list(l_w=1,g_w=10)) #
 reg_logl <- nls(survival ~ 1/(1 + (time/a_l)^g_l),data, start=list(a_l=1,g_l=1)) #Log-Logistic 
 reg_gomp <- nls(survival ~ exp(-(b/a)*(exp(a*time) - 1)),data, start=list(a=0.1,b=0.01), algorithm="port", lower=c(-Inf,-Inf)) #Gompertz
 reg_lnorm <- nls(survival ~ 1- pnorm(((log(time)-mu_ln)/sd_ln),0,1),data, start=list(mu_ln=1,sd_ln=1)) #Lognormal
-reg_gam_gen <- nls(survival ~ 1 - pgengamma(time, mu_g, sigma, Q),data, start=list(sigma=1,mu_g=1, Q=1), algorithm="port", lower=c(-Inf,-Inf,-Inf)) #Generalized Gama 
+reg_gam_gen <- nls(survival ~ 1 - pgengamma(time, mu_g, sigma, Q),data, start=list(sigma=1,mu_g=1, Q=1), algorithm="port", lower=c(0,-Inf,-Inf)) #Generalized Gama 
 
 #Store summary fitting
 s_reg_exp <- summary(reg_exp)
